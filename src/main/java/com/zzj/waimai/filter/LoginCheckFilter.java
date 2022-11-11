@@ -1,6 +1,7 @@
 package com.zzj.waimai.filter;
 import com.alibaba.fastjson.JSON;
 import com.zzj.waimai.common.R;
+import com.zzj.waimai.util.BaseContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.AntPathMatcher;
 import javax.servlet.*;
@@ -50,6 +51,10 @@ public class LoginCheckFilter implements Filter {
         }
         //判断用户已经登陆可以放行
         if(httpServletRequest.getSession().getAttribute("employee")!=null){
+
+            Long empId = (Long) httpServletRequest.getSession().getAttribute("employee");
+            BaseContext.setCurrentId(empId);
+
             filterChain.doFilter(httpServletRequest,httpServletResponse);
             return;
         }
