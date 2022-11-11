@@ -4,7 +4,7 @@ package com.zzj.waimai.controller;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.zzj.waimai.common.R;
-import com.zzj.waimai.entity.Employee;
+import com.zzj.waimai.pojo.Employee;
 import com.zzj.waimai.service.EmployeeService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -14,7 +14,6 @@ import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 
 
@@ -68,14 +67,14 @@ public class EmployeeController {
         //设置默认密码，顺手加密了
         employee.setPassword(DigestUtils.md5DigestAsHex("123456".getBytes()));
         //设置修改时间
-        employee.setCreateTime(LocalDateTime.now());
-        employee.setUpdateTime(LocalDateTime.now());
+       // employee.setCreateTime(LocalDateTime.now());
+       // employee.setUpdateTime(LocalDateTime.now());
         //账户默认状态0
         employee.setStatus(0);
         //获取当前新增操作人员的id
-        Long empId= (Long) httpServletRequest.getSession().getAttribute("employee");
-        employee.setCreateUser(empId);
-        employee.setUpdateUser(empId);
+      //  Long empId= (Long) httpServletRequest.getSession().getAttribute("employee");
+       // employee.setCreateUser(empId);
+       // employee.setUpdateUser(empId);
         //MP自动CRUD的功能，封装好了save方法
         employeeService.save(employee);
         return R.success("新增员工成功");
@@ -112,13 +111,13 @@ public class EmployeeController {
     public R<Employee> update(HttpServletRequest httpServletRequest,@RequestBody Employee employee){
         System.out.println("更新"+Thread.currentThread().getName());
         //从Request作用域中拿到员工ID
-        Long empId = (Long) httpServletRequest.getSession().getAttribute("employee");
+      //  Long empId = (Long) httpServletRequest.getSession().getAttribute("employee");
         //拿新的状态值
-        employee.setStatus(employee.getStatus());
+    //    employee.setStatus(employee.getStatus());
         //更新时间
-        employee.setUpdateTime(LocalDateTime.now());
+      //  employee.setUpdateTime(LocalDateTime.now());
         //更新处理人id
-        employee.setUpdateUser(empId);
+       // employee.setUpdateUser(empId);
         employeeService.updateById(employee);
         return R.success(employee);
     }

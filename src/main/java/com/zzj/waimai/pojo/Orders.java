@@ -1,4 +1,4 @@
-package com.zzj.waimai.entity;
+package com.zzj.waimai.pojo;
 
 import lombok.Data;
 import java.io.Serializable;

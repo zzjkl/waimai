@@ -1,4 +1,4 @@
-package com.zzj.waimai.entity;
+package com.zzj.waimai.pojo;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;

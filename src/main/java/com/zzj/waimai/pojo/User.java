@@ -1,12 +1,9 @@
-package com.zzj.waimai.entity;
+package com.zzj.waimai.pojo;
 
 import lombok.Data;
-import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.List;
+
 import java.io.Serializable;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
+
 /**
  * 用户信息
  */
