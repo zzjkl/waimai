@@ -29,7 +29,7 @@ public class GloableExceptionHandler {
     @ExceptionHandler({SQLIntegrityConstraintViolationException.class,NullPointerException.class})
     public R<String> exceptionHandler(SQLIntegrityConstraintViolationException exception){
         log.error(exception.getMessage());
-        //这里判断出来是添加员工时出现的异常
+
         if (exception.getMessage().contains("Duplicate entry")){
             //exception对象分割，同时存储
             String []splitErrorMessage=exception.getMessage().split(" ");
@@ -38,11 +38,21 @@ public class GloableExceptionHandler {
              * Duplicate entry '新增的账号' for key 'idx_username'
              * 下标位2是新增账号，下标位5是关联的字段名
              */
-            String errorMessage = "这个账号重复了" + splitErrorMessage[2];
+            String errorMessage =  splitErrorMessage[2]+"已存在";
             return R.error(errorMessage);
         }
         return R.error("未知错误");
     }
 
-
+    /**
+     * 自定义的全局异常处理
+     * @param customerException 自定义异常对象
+     * @return
+     */
+    @ExceptionHandler({CustomException.class})
+    public R<String> exceptionHandlerCustomer(CustomException customerException){
+        log.error(customerException.getMessage());
+        //直接返回处理信息
+        return R.error(customerException.getMessage());
+    }
 }

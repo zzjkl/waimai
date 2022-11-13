@@ -51,6 +51,7 @@ public class Category implements Serializable {
 
 
     //是否删除
-    private Integer isDeleted;
+    //@TableField(exist = false) //补上这个
+    //private Integer isDeleted;
 
 }

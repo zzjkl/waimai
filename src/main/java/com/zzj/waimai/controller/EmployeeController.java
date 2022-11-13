@@ -14,8 +14,10 @@ import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.time.LocalDateTime;
 
+//用途： 控制层，负责具体模块的业务流程控制，需要调用service逻辑设计层的接口来控制业务流程。
+// 因为service中的方法是我们使用到的，controller通过接收前端H5或者App传过来的参数进行业务操作
+// ，再将处理结果返回到前端。
 
 @Slf4j
 @RestController
