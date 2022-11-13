@@ -66,12 +66,12 @@ public class CategoryController {
      *
      * @param category 传回来的菜品分类对象
      */
-//    @PutMapping()
-//    public R<String> updateCategory(@RequestBody Category category) {
-//        log.info("更新种类{}", category);
-//        categoryService.updateById(category);
-//        return R.success("菜品种类更新完成");
-//    }
+    @PutMapping()
+    public R<String> updateCategory(@RequestBody Category category) {
+        log.info("更新种类{}", category);
+        categoryService.updateById(category);
+        return R.success("菜品种类更新完成");
+    }
 
 
     /**
