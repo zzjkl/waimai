@@ -79,18 +79,18 @@ public class CategoryController {
      * @param category 从前端接收一个type=1的标注，目的是在分类表中，菜品分类是1，套餐分类是2，把二者区分开
      * @return
      */
-//    @GetMapping("/list")
-//    public R<List> listShowCategory(Category category){
-//        //条件构造器
-//        LambdaQueryWrapper<Category> lambdaQueryWrapper = new LambdaQueryWrapper();
-//        //MP也支持把对象先判断一下，非空才能进行查询
-//        lambdaQueryWrapper.eq(category.getType() != null, Category::getType, category.getType());
-//        //lambdaQueryWrapper.eq(Category::getType, category.getType());
-//        //按时间倒叙排序
-//        lambdaQueryWrapper.orderByDesc(Category::getUpdateTime);
-//        //查询
-//        List<Category> categoryList = categoryService.list(lambdaQueryWrapper);
-//        return R.success(categoryList);
-//    }
+    @GetMapping("/list")
+    public R<List> listShowCategory(Category category){
+        //条件构造器
+        LambdaQueryWrapper<Category> lambdaQueryWrapper = new LambdaQueryWrapper();
+        //MP也支持把对象先判断一下，非空才能进行查询
+        lambdaQueryWrapper.eq(category.getType() != null, Category::getType, category.getType());
+        //lambdaQueryWrapper.eq(Category::getType, category.getType());
+        //按时间倒叙排序
+        lambdaQueryWrapper.orderByDesc(Category::getUpdateTime);
+        //查询
+        List<Category> categoryList = categoryService.list(lambdaQueryWrapper);
+        return R.success(categoryList);
+    }
 
 }
