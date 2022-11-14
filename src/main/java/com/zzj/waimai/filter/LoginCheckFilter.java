@@ -50,10 +50,19 @@ public class LoginCheckFilter implements Filter {
             //放行完了直接结束就行
             return;
         }
-        //判断用户已经登陆可以放行
+        //判断用户已经登陆可以放行（PC后台版）
         if(httpServletRequest.getSession().getAttribute("employee")!=null){
 
             Long empId = (Long) httpServletRequest.getSession().getAttribute("employee");
+            BaseContext.setCurrentId(empId);
+
+            filterChain.doFilter(httpServletRequest,httpServletResponse);
+            return;
+        }
+        ////判断用户已经登陆可以放行（移动端前台版）
+        if(httpServletRequest.getSession().getAttribute("user")!=null){
+
+            Long empId = (Long) httpServletRequest.getSession().getAttribute("user");
             BaseContext.setCurrentId(empId);
 
             filterChain.doFilter(httpServletRequest,httpServletResponse);

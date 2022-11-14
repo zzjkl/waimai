@@ -155,30 +155,30 @@ public class DishController {
      * @param ids Dish的id
      * @return
      */
-//    @PostMapping("/status/0")
-//    public R<String> updateStatusStop(Long ids){
-//        Dish dish=dishService.getById(ids);
-//        dish.setStatus(0);
-//        LambdaQueryWrapper<Dish> lambdaQueryWrapper = new LambdaQueryWrapper<>();
-//        lambdaQueryWrapper.eq(Dish::getId, ids);
-//        dishService.update(dish, lambdaQueryWrapper);
-//        return R.success("更新成功");
-//    }
+    @PostMapping("/status/0")
+    public R<String> updateStatusStop(Long ids){
+        Dish dish=dishService.getById(ids);
+        dish.setStatus(0);
+        LambdaQueryWrapper<Dish> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(Dish::getId, ids);
+        dishService.update(dish, lambdaQueryWrapper);
+        return R.success("更新成功");
+    }
 
     /**
      * 更新菜品状态为起售
      * @param ids Dish的id
      * @return
      */
-//    @PostMapping("/status/1")
-//    public R<String> updateStatusStart(Long ids){
-//        Dish dish=dishService.getById(ids);
-//        dish.setStatus(1);
-//        LambdaQueryWrapper<Dish> lambdaQueryWrapper = new LambdaQueryWrapper<>();
-//        lambdaQueryWrapper.eq(Dish::getId, ids);
-//        dishService.update(dish, lambdaQueryWrapper);
-//        return R.success("更新成功");
-//    }
+    @PostMapping("/status/1")
+    public R<String> updateStatusStart(Long ids){
+        Dish dish=dishService.getById(ids);
+        dish.setStatus(1);
+        LambdaQueryWrapper<Dish> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(Dish::getId, ids);
+        dishService.update(dish, lambdaQueryWrapper);
+        return R.success("更新成功");
+    }
 
     /**
      * 这里是逻辑删除，不是真删，把isDeleted字段更新为1就不显示了，间接完成了逻辑删除
