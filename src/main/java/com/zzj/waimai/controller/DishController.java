@@ -202,8 +202,8 @@ public class DishController {
      *             Dish本身里面也是有categoryId的
      * @return
      */
-    /* @GetMapping("/list")
-    public Result<List<Dish>> listCategory(Dish dish){
+     @GetMapping("/list")
+    public R<List<Dish>> listCategory(Dish dish){
         LambdaQueryWrapper<Dish> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         //查询
         lambdaQueryWrapper.eq(dish.getCategoryId() != null, Dish::getCategoryId, dish.getCategoryId());
@@ -212,8 +212,8 @@ public class DishController {
         //排序，多个字段排序，先按Sort排，再按UpdateTime排
         lambdaQueryWrapper.orderByAsc(Dish::getSort).orderByDesc(Dish::getUpdateTime);
         List<Dish> dishList = dishService.list(lambdaQueryWrapper);
-        return Result.success(dishList);
-    }*/
+        return R.success(dishList);
+    }
 
 //    @GetMapping("/list")
 //    public R<List<DishDto>> listCategory(Dish dish){
