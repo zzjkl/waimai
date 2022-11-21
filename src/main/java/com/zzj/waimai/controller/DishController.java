@@ -180,11 +180,11 @@ public class DishController {
         return R.success("更新成功");
     }
 
-    /**
-     * 这里是逻辑删除，不是真删，把isDeleted字段更新为1就不显示了，间接完成了逻辑删除
-     * @param ids Dish的id
-     * @return
-     */
+//    /**
+//     * 这里是逻辑删除，不是真删，把isDeleted字段更新为1就不显示了，间接完成了逻辑删除
+//     * @param ids Dish的id
+//     * @return
+//     */
 //    @DeleteMapping()
 //    public R<String> deleteDish(Long ids){
 //        Dish dish=dishService.getById(ids);
@@ -196,41 +196,14 @@ public class DishController {
 //    }
 
 
-    /**
-     * 新增套餐时 根据条件查询并填充菜品列表
-     * @param dish 这里本来是categoryId的，但是为了保证通用性，这里用Dish对象进行封装 有更好的通用性
-     *             Dish本身里面也是有categoryId的
-     * @return
-     */
-     @GetMapping("/list")
-    public R<List<Dish>> listCategory(Dish dish){
-        LambdaQueryWrapper<Dish> lambdaQueryWrapper = new LambdaQueryWrapper<>();
-        //查询
-        lambdaQueryWrapper.eq(dish.getCategoryId() != null, Dish::getCategoryId, dish.getCategoryId());
-        //只查在售状态的菜品，1为启售状态
-        lambdaQueryWrapper.eq(Dish::getStatus, 1);
-        //排序，多个字段排序，先按Sort排，再按UpdateTime排
-        lambdaQueryWrapper.orderByAsc(Dish::getSort).orderByDesc(Dish::getUpdateTime);
-        List<Dish> dishList = dishService.list(lambdaQueryWrapper);
-        return R.success(dishList);
-    }
-
-//    @GetMapping("/list")
-//    public R<List<DishDto>> listCategory(Dish dish){
-//        //结果返回对象
-//        List<DishDto> dishDtoList = null;
-//        //缓存优化
-//        //构造一个存入redis的key值
-//        String redisKey = "dish_" + dish.getCategoryId() + "_" + dish.getStatus();
-//        //从Redis中获取缓存数据
-//        dishDtoList= (List<DishDto>) redisTemplate.opsForValue().get(redisKey);
-//        //如果有，到这里就直接返回结束了
-//        if (dishDtoList != null) {
-//            return R.success(dishDtoList);
-//        }
-//
-//        //如果没有，就根据查询数据库，再根据构造的Key存入一个菜品数据
-//
+//    /**
+//     * 新增套餐时 根据条件查询并填充菜品列表
+//     * @param dish 这里本来是categoryId的，但是为了保证通用性，这里用Dish对象进行封装 有更好的通用性
+//     *             Dish本身里面也是有categoryId的
+//     * @return
+//     */
+//     @GetMapping("/list")
+//    public R<List<Dish>> listCategory(Dish dish){
 //        LambdaQueryWrapper<Dish> lambdaQueryWrapper = new LambdaQueryWrapper<>();
 //        //查询
 //        lambdaQueryWrapper.eq(dish.getCategoryId() != null, Dish::getCategoryId, dish.getCategoryId());
@@ -238,39 +211,66 @@ public class DishController {
 //        lambdaQueryWrapper.eq(Dish::getStatus, 1);
 //        //排序，多个字段排序，先按Sort排，再按UpdateTime排
 //        lambdaQueryWrapper.orderByAsc(Dish::getSort).orderByDesc(Dish::getUpdateTime);
-//
 //        List<Dish> dishList = dishService.list(lambdaQueryWrapper);
-//        //要在这个基础上追加出来flavor的菜品表，复用上面的内容
-//        //将List集合搬入Dto中
-//        //这里是流式编程的内容，或者用foreach来进行搬运也可以解决
-//        dishDtoList = dishList.stream().map((item) -> {
-//            DishDto dishDto = new DishDto();
-//            BeanUtils.copyProperties(item,dishDto);
-//
-//            Long categoryId = item.getCategoryId();//分类id
-//
-//            //根据id查询分类对象，赋值categoryName
-//            Category category = categoryService.getById(categoryId);
-//
-//            if(category != null){
-//                String categoryName = category.getName();
-//                dishDto.setCategoryName(categoryName);
-//            }
-//
-//            //根据当前菜品的id查询菜品表下dishId对应的菜品
-//            Long dishId = item.getId();
-//            LambdaQueryWrapper<DishFlavor> dishFlavorLambdaQueryWrapper = new LambdaQueryWrapper<>();
-//            dishFlavorLambdaQueryWrapper.eq(DishFlavor::getDishId, dishId);
-//            List<DishFlavor> dishFlavorList = dishFlavorService.list(dishFlavorLambdaQueryWrapper);
-//
-//            dishDto.setFlavors(dishFlavorList);
-//
-//            return dishDto;
-//        }).collect(Collectors.toList());
-//
-//        //把从数据库里查出来的数据进行缓存，设置好过期时间60s
-//        redisTemplate.opsForValue().set(redisKey,dishDtoList,60, TimeUnit.MINUTES);
-//
-//        return R.success(dishDtoList);
+//        return R.success(dishList);
 //    }
+
+    @GetMapping("/list")
+    public R<List<DishDto>> listCategory(Dish dish){
+        //结果返回对象
+      //  List<DishDto> dishDtoList = null;
+        //缓存优化
+        //构造一个存入redis的key值
+       // String redisKey = "dish_" + dish.getCategoryId() + "_" + dish.getStatus();
+        //从Redis中获取缓存数据
+       // dishDtoList= (List<DishDto>) redisTemplate.opsForValue().get(redisKey);
+        //如果有，到这里就直接返回结束了
+       // if (dishDtoList != null) {
+      //      return R.success(dishDtoList);
+      //  }
+
+        //如果没有，就根据查询数据库，再根据构造的Key存入一个菜品数据
+
+        LambdaQueryWrapper<Dish> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        //查询
+        lambdaQueryWrapper.eq(dish.getCategoryId() != null, Dish::getCategoryId, dish.getCategoryId());
+        //只查在售状态的菜品，1为启售状态
+        lambdaQueryWrapper.eq(Dish::getStatus, 1);
+        //排序，多个字段排序，先按Sort排，再按UpdateTime排
+        lambdaQueryWrapper.orderByAsc(Dish::getSort).orderByDesc(Dish::getUpdateTime);
+
+        List<Dish> dishList = dishService.list(lambdaQueryWrapper);
+        //要在这个基础上追加出来flavor的菜品表，复用上面的内容
+        //将List集合搬入Dto中
+        //这里是流式编程的内容，或者用foreach来进行搬运也可以解决
+        List<DishDto> dishDtoList = dishList.stream().map((item) -> {
+            DishDto dishDto = new DishDto();
+            BeanUtils.copyProperties(item,dishDto);
+
+            Long categoryId = item.getCategoryId();//分类id
+
+            //根据id查询分类对象，赋值categoryName
+            Category category = categoryService.getById(categoryId);
+
+            if(category != null){
+                String categoryName = category.getName();
+                dishDto.setCategoryName(categoryName);
+            }
+
+            //根据当前菜品的id查询菜品表下dishId对应的菜品
+            Long dishId = item.getId();
+            LambdaQueryWrapper<DishFlavor> dishFlavorLambdaQueryWrapper = new LambdaQueryWrapper<>();
+            dishFlavorLambdaQueryWrapper.eq(DishFlavor::getDishId, dishId);
+            List<DishFlavor> dishFlavorList = dishFlavorService.list(dishFlavorLambdaQueryWrapper);
+
+            dishDto.setFlavors(dishFlavorList);
+
+            return dishDto;
+        }).collect(Collectors.toList());
+
+        //把从数据库里查出来的数据进行缓存，设置好过期时间60s
+        //redisTemplate.opsForValue().set(redisKey,dishDtoList,60, TimeUnit.MINUTES);
+
+        return R.success(dishDtoList);
+    }
 }
