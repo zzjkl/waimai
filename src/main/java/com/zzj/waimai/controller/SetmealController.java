@@ -9,6 +9,10 @@ import com.zzj.waimai.pojo.Setmeal;
 import com.zzj.waimai.pojo.SetmealDish;
 import com.zzj.waimai.service.SetmealDishService;
 import com.zzj.waimai.service.SetmealService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -27,6 +31,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/setmeal")
 @Slf4j
+@Api(tags = "套餐相关接口")
 public class SetmealController {
 
     @Autowired
@@ -43,7 +48,7 @@ public class SetmealController {
      * @return
      */
     @PostMapping()
-
+    @ApiOperation(value = "新增套餐接口")
     public R<String> saveSetmeal(@RequestBody SetmealDto setmealDto) {
         log.info(setmealDto.toString());
         //因为是两张表关联查询，所以MP直接查是不可以的，自己写一个，把两个信息关联起来存储
@@ -60,6 +65,12 @@ public class SetmealController {
      * @return
      */
     @GetMapping("/page")
+    @ApiOperation(value = "套餐分页查询接口")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "page",value = "页码",required = true),
+            @ApiImplicitParam(name = "pageSize",value = "每页记录数",required = true),
+            @ApiImplicitParam(name = "name",value = "套餐名称",required = false)
+    })
     public R<Page> pageList(int page, int pageSize, String name) {
         Page page1 = new Page<>();
 
@@ -91,7 +102,7 @@ public class SetmealController {
      * @return
      */
     @DeleteMapping()
-
+    @ApiOperation(value = "套餐删除接口")
     public R<String> deleteSetmeal(@RequestParam List<Long> ids){
         log.info("ids:{}", ids);
         setmealService.removeWithDish(ids);
@@ -105,6 +116,7 @@ public class SetmealController {
      * @return
      */
     @PostMapping("/status/0")
+    @ApiOperation(value = "套餐启售接口")
     public R<String> startSale(Long ids){
         Setmeal setmeal=setmealService.getById(ids);
         setmeal.setStatus(0);
@@ -114,6 +126,7 @@ public class SetmealController {
         return R.success("更新状态为启售");
     }
     @PostMapping("/status/1")
+    @ApiOperation(value = "套餐停售接口")
     public R<String> stopSale(Long ids){
         Setmeal setmeal=setmealService.getById(ids);
         setmeal.setStatus(1);
@@ -132,6 +145,7 @@ public class SetmealController {
      */
     @GetMapping("/list")  // 在消费者端 展示套餐信息
    // @Cacheable(value = "setmealCache",key = "#setmeal.categoryId+'_'+#setmeal.status")
+    @ApiOperation(value = "套餐条件查询接口")
     public R<List<Setmeal>> list(Setmeal setmeal){
         LambdaQueryWrapper<Setmeal> queryWrapper = new LambdaQueryWrapper<>();
         Long categoryId = setmeal.getCategoryId();
