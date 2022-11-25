@@ -71,8 +71,8 @@ public class EmployeeController {
         //设置修改时间
        // employee.setCreateTime(LocalDateTime.now());
        // employee.setUpdateTime(LocalDateTime.now());
-        //账户默认状态0
-        employee.setStatus(0);
+        //账户默认状态1
+        employee.setStatus(1);
         //获取当前新增操作人员的id
       //  Long empId= (Long) httpServletRequest.getSession().getAttribute("employee");
        // employee.setCreateUser(empId);

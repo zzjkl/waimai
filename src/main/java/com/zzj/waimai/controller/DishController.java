@@ -14,9 +14,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CachePut;
+import org.springframework.data.redis.cache.RedisCacheManager;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -41,7 +44,11 @@ public class DishController {
     @Autowired
     private DishFlavorService dishFlavorService;
 
+    @Autowired
+    private RedisTemplate redisTemplate;
 
+    @Autowired
+    private RedisCacheManager redisCacheManager;
     /**
      * 新增菜品
      * @param dishDto 传输对象
@@ -52,6 +59,10 @@ public class DishController {
     public R<String> addDish(@RequestBody DishDto dishDto) {
         log.info(dishDto.toString());
         dishService.addDishWithFlavor(dishDto);
+
+        String redisKey = "dish_" + dishDto.getCategoryId() + "_" + dishDto.getStatus()+"_1";
+        redisTemplate.delete(redisKey);
+
         return R.success("保存成功");
     }
 
@@ -114,7 +125,7 @@ public class DishController {
      * @param id 菜品id
      * @return
      */
-//    @CachePut(value = "userCache",key="#dishDto.id")
+    @CachePut(value = "userCache",key="#dishDto.id")
     @GetMapping("/{id}")
     //id在url里面，用pathvariable
     public R<DishDto> updateDish(@PathVariable Long id){
@@ -141,9 +152,9 @@ public class DishController {
         //redisTemplate.delete(keys);
 
         //精确删除，在售状态的
-//        String redisKey = "dish_" + dishDto.getCategoryId() + "_" + dishDto.getStatus()+"_1";
-  //      log.info("准备清理key为:{} 的缓存数据",redisKey);
-//        redisTemplate.delete(redisKey);
+        String redisKey = "dish_" + dishDto.getCategoryId() + "_" + dishDto.getStatus()+"_1";
+        log.info("准备清理key为:{} 的缓存数据",redisKey);
+        redisTemplate.delete(redisKey);
 
 
         return R.success("更新成功");
@@ -218,16 +229,16 @@ public class DishController {
     @GetMapping("/list")
     public R<List<DishDto>> listCategory(Dish dish){
         //结果返回对象
-      //  List<DishDto> dishDtoList = null;
+        List<DishDto> dishDtoList = null;
         //缓存优化
         //构造一个存入redis的key值
-       // String redisKey = "dish_" + dish.getCategoryId() + "_" + dish.getStatus();
+        String redisKey = "dish_" + dish.getCategoryId() + "_" + dish.getStatus();
         //从Redis中获取缓存数据
-       // dishDtoList= (List<DishDto>) redisTemplate.opsForValue().get(redisKey);
+        dishDtoList =(List<DishDto>) redisTemplate.opsForValue().get(redisKey);
         //如果有，到这里就直接返回结束了
-       // if (dishDtoList != null) {
-      //      return R.success(dishDtoList);
-      //  }
+        if (dishDtoList != null) {
+            return R.success(dishDtoList);
+        }
 
         //如果没有，就根据查询数据库，再根据构造的Key存入一个菜品数据
 
@@ -243,7 +254,7 @@ public class DishController {
         //要在这个基础上追加出来flavor的菜品表，复用上面的内容
         //将List集合搬入Dto中
         //这里是流式编程的内容，或者用foreach来进行搬运也可以解决
-        List<DishDto> dishDtoList = dishList.stream().map((item) -> {
+        dishDtoList = dishList.stream().map((item) -> {
             DishDto dishDto = new DishDto();
             BeanUtils.copyProperties(item,dishDto);
 
@@ -269,7 +280,7 @@ public class DishController {
         }).collect(Collectors.toList());
 
         //把从数据库里查出来的数据进行缓存，设置好过期时间60s
-        //redisTemplate.opsForValue().set(redisKey,dishDtoList,60, TimeUnit.MINUTES);
+        redisTemplate.opsForValue().set(redisKey, dishDtoList,60, TimeUnit.MINUTES);
 
         return R.success(dishDtoList);
     }
