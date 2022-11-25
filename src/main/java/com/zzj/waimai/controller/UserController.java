@@ -9,12 +9,15 @@ import com.zzj.waimai.util.ValidateCodeUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpSession;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 用户信息 前端控制器
@@ -25,6 +28,9 @@ import javax.servlet.http.HttpSession;
 public class UserController {
     @Autowired
    private UserService userService;
+    @Autowired
+    private RedisTemplate redisTemplate;
+
 
     /**
      * 发送手机短信验证码
@@ -41,8 +47,10 @@ public class UserController {
            // 调用阿里云提供的短信服务API完成发送短信
                     //SMSUti1s..sendMessage("..... "，，phone,,code);
             //需要将生成的验证码保存到Session
-            session.setAttribute(phone,code);
-            return R.success("手机验证码短信发送成功");
+           // session.setAttribute(phone,code);
+            // return R.success("手机验证码短信发送成功");
+            redisTemplate.opsForValue().set(phone, code, 5, TimeUnit.MINUTES);
+            return R.success("验证码发送成功，有效时间为5分钟");
         }
         return  R.error("短信发送失败");
     }
@@ -58,7 +66,9 @@ public class UserController {
         String code = userDto.getCode();
         String phone = userDto.getPhone();
         //从session中拿到对应的验证码
-        String tempCode = (String) codeInSession.getAttribute(phone);
+        //String tempCode = (String) codeInSession.getAttribute(phone);
+        //从Redis中拿验证
+        String tempCode = (String) redisTemplate.opsForValue().get(phone);
         //验证码相等
         if (code.equals(tempCode) && codeInSession != null) {
             //是否为新用户，如果是新用户顺手注册了
@@ -75,9 +85,13 @@ public class UserController {
                 userService.save(user);
             }
             //已经可以登陆放行了，就删了session中的code再放行，减轻session压力
-            codeInSession.removeAttribute(phone);
+           // codeInSession.removeAttribute(phone);
             //把用户的ID存入Session，留给过滤器进行验证放行
             codeInSession.setAttribute("user", user.getId());
+            //此时已经登陆成功，向Redis中存入userId的信息留给过滤器进行验证放行
+            redisTemplate.opsForValue().set("user", user.getId());
+            //再删掉验证码
+            redisTemplate.delete(phone);
             return R.success("登陆成功，欢迎~");
         }
         return R.error("验证码错误");
