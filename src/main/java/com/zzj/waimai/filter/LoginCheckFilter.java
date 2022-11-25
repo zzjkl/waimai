@@ -3,6 +3,8 @@ import com.alibaba.fastjson.JSON;
 import com.zzj.waimai.common.R;
 import com.zzj.waimai.util.BaseContext;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.AntPathMatcher;
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
@@ -16,6 +18,8 @@ import java.io.IOException;
 @WebFilter(filterName = "loginCheckFilter", urlPatterns = "/*")
 @Slf4j
 public class LoginCheckFilter implements Filter {
+    @Autowired
+    private RedisTemplate redisTemplate;
     //调用Spring核心包的字符串匹配类
     //路径匹配器 支持通配符
     public static final AntPathMatcher PATH_MATCHER = new AntPathMatcher();
@@ -51,19 +55,22 @@ public class LoginCheckFilter implements Filter {
             return;
         }
         //判断用户已经登陆可以放行（PC后台版）
-        if(httpServletRequest.getSession().getAttribute("employee")!=null){
+        if (redisTemplate.opsForValue().get("employee")!= null){
+        //if(httpServletRequest.getSession().getAttribute("employee")!=null){
 
-            Long empId = (Long) httpServletRequest.getSession().getAttribute("employee");
+            //Long empId = (Long) httpServletRequest.getSession().getAttribute("employee");
+            Long empId= (Long) redisTemplate.opsForValue().get("employee");
             BaseContext.setCurrentId(empId);
 
             filterChain.doFilter(httpServletRequest,httpServletResponse);
             return;
         }
         ////判断用户已经登陆可以放行（移动端前台版）
-        if(httpServletRequest.getSession().getAttribute("user")!=null){
-
-            Long empId = (Long) httpServletRequest.getSession().getAttribute("user");
-            BaseContext.setCurrentId(empId);
+       // if(httpServletRequest.getSession().getAttribute("user")!=null){
+        if (redisTemplate.opsForValue().get("user") != null){
+            Long userId= (Long) redisTemplate.opsForValue().get("user");
+           // Long userId = (Long) httpServletRequest.getSession().getAttribute("user");
+            BaseContext.setCurrentId(userId);
 
             filterChain.doFilter(httpServletRequest,httpServletResponse);
             return;

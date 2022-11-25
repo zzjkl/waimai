@@ -15,6 +15,10 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.redis.cache.RedisCache;
+import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -40,6 +44,9 @@ public class SetmealController {
     @Autowired
     private SetmealDishService setmealDishService;
 
+    @Autowired
+    private RedisCacheManager redisCacheManager;
+
     @Resource
     private SetmealMapper setmealMapper;
     /**
@@ -48,6 +55,7 @@ public class SetmealController {
      * @return
      */
     @PostMapping()
+    @CacheEvict(value = "setmealCache",allEntries = true)
     @ApiOperation(value = "新增套餐接口")
     public R<String> saveSetmeal(@RequestBody SetmealDto setmealDto) {
         log.info(setmealDto.toString());
@@ -116,24 +124,26 @@ public class SetmealController {
      * @return
      */
     @PostMapping("/status/0")
-    @ApiOperation(value = "套餐启售接口")
+    @ApiOperation(value = "套餐停售接口")
+    @CacheEvict(value = "setmealCache",allEntries = true)
     public R<String> startSale(Long ids){
         Setmeal setmeal=setmealService.getById(ids);
         setmeal.setStatus(0);
         LambdaQueryWrapper<Setmeal> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.eq(Setmeal::getId, ids);
         setmealService.update(setmeal, lambdaQueryWrapper);
-        return R.success("更新状态为启售");
+        return R.success("更新状态为停售");
     }
     @PostMapping("/status/1")
-    @ApiOperation(value = "套餐停售接口")
+    @ApiOperation(value = "套餐启售接口")
+    @CacheEvict(value = "setmealCache",allEntries = true)
     public R<String> stopSale(Long ids){
         Setmeal setmeal=setmealService.getById(ids);
         setmeal.setStatus(1);
         LambdaQueryWrapper<Setmeal> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.eq(Setmeal::getId, ids);
         setmealService.update(setmeal, lambdaQueryWrapper);
-        return R.success("更新状态为停售");
+        return R.success("更新状态为启售");
     }
 
     /**
@@ -144,7 +154,7 @@ public class SetmealController {
      * @return
      */
     @GetMapping("/list")  // 在消费者端 展示套餐信息
-   // @Cacheable(value = "setmealCache",key = "#setmeal.categoryId+'_'+#setmeal.status")
+    @Cacheable(value = "setmealCache",key = "#setmeal.categoryId+'_'+#setmeal.status")
     @ApiOperation(value = "套餐条件查询接口")
     public R<List<Setmeal>> list(Setmeal setmeal){
         LambdaQueryWrapper<Setmeal> queryWrapper = new LambdaQueryWrapper<>();

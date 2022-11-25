@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CachePut;
+import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,6 +46,9 @@ public class DishController {
 
     @Autowired
     private RedisTemplate redisTemplate;
+
+    @Autowired
+    private RedisCacheManager redisCacheManager;
     /**
      * 新增菜品
      * @param dishDto 传输对象
@@ -121,7 +125,7 @@ public class DishController {
      * @param id 菜品id
      * @return
      */
-//    @CachePut(value = "userCache",key="#dishDto.id")
+    @CachePut(value = "userCache",key="#dishDto.id")
     @GetMapping("/{id}")
     //id在url里面，用pathvariable
     public R<DishDto> updateDish(@PathVariable Long id){
